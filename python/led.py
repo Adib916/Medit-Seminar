@@ -1,13 +1,12 @@
 from __future__ import print_function
-from rpi_ws281x import *
 from __future__ import division
+from rpi_ws281x import *
 
 import platform
 import numpy as np
 import config
 
 # Raspberry Pi controls the LED strip directly
-config.DEVICE == 'pi':
 strip = Adafruit_NeoPixel(config.N_PIXELS, config.LED_PIN,
                           config.LED_FREQ_HZ, config.LED_DMA,
                           config.LED_INVERT, config.BRIGHTNESS)
@@ -49,8 +48,13 @@ def _update_pi():
 
         strip._led_data[i] = int(rgb[i])
     _prev_pixels = np.copy(p)
-    print('r: {:.0f} , g: {:.0f}, b: {:.0f}'.format(r, g, b))
+    print("r = " ,r)
+    print("g = ", g)
+    print("b = ", b)
+    print("\n")
+    print("\n")
     strip.show()
+
 
 
 def update():

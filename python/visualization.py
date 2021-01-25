@@ -186,6 +186,8 @@ visualization_type = visualize_spectrum
 """Visualization effect to display on the LED strip"""
 
 
+visualization_effect = visualization_type
+
 if __name__ == '__main__':
     # Initialize LEDs
     led.update()
