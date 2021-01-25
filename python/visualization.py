@@ -174,7 +174,7 @@ def microphone_update(audio_samples):
         mel /= mel_gain.value
         mel = mel_smoothing.update(mel)
         # Map filterbank output onto LED strip
-        output = visualization_effect(mel)
+        visualization_effect(mel)
 
 
 # Number of audio samples to read every time frame
