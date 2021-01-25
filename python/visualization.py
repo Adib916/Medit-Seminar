@@ -157,7 +157,6 @@ def microphone_update(audio_samples):
     if vol < config.MIN_VOLUME_THRESHOLD:
         print('No audio input. Volume below threshold. Volume:', vol)
         led.pixels = np.tile(0, (3, config.N_PIXELS))
-        led.update()
     else:
         # Transform audio input into the frequency domain
         N = len(y_data)
@@ -179,7 +178,6 @@ def microphone_update(audio_samples):
         # Map filterbank output onto LED strip
         output = visualization_effect(mel)
         led.pixels = output
-        led.update()
 
 
 # Number of audio samples to read every time frame
