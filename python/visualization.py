@@ -227,17 +227,7 @@ def microphone_update(audio_samples):
         output = visualization_effect(mel)
         led.pixels = output
         led.update()
-        if config.USE_GUI:
-            # Plot filterbank output
-            x = np.linspace(config.MIN_FREQUENCY, config.MAX_FREQUENCY, len(mel))
-            mel_curve.setData(x=x, y=fft_plot_filter.update(mel))
-            # Plot the color channels
-            r_curve.setData(y=led.pixels[0])
-            g_curve.setData(y=led.pixels[1])
-            b_curve.setData(y=led.pixels[2])
-    if config.USE_GUI:
-        app.processEvents()
-    
+   
     if config.DISPLAY_FPS:
         fps = frames_per_second()
         if time.time() - 0.5 > prev_fps_update:
@@ -265,29 +255,7 @@ visualization_effect = visualization_type
 
 
 if __name__ == '__main__':
-    if config.USE_GUI:
-        import pyqtgraph as pg
-        from pyqtgraph.Qt import QtGui, QtCore
-        # Create GUI window
-        app = QtGui.QApplication([])
-        view = pg.GraphicsView()
-        layout = pg.GraphicsLayout(border=(100,100,100))
-        view.setCentralItem(layout)
-        view.show()
-        view.setWindowTitle('Visualization')
-        view.resize(800,600)
-        # Mel filterbank plot
-        fft_plot = layout.addPlot(title='Filterbank Output', colspan=3)
-        fft_plot.setRange(yRange=[-0.1, 1.2])
-        fft_plot.disableAutoRange(axis=pg.ViewBox.YAxis)
-        x_data = np.array(range(1, config.N_FFT_BINS + 1))
-        mel_curve = pg.PlotCurveItem()
-        mel_curve.setData(x=x_data, y=x_data*0)
-        fft_plot.addItem(mel_curve)
-        # Visualization plot
-        layout.nextRow()
-        led_plot = layout.addPlot(title='Visualization Output', colspan=3)
-        led_plot.setRange(yRange=[-5, 260])
+d_plot.setRange(yRange=[-5, 260])
         led_plot.disableAutoRange(axis=pg.ViewBox.YAxis)
         # Pen for each of the color channel curves
         r_pen = pg.mkPen((255, 30, 30, 200), width=4)
