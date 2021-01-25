@@ -6,9 +6,6 @@ from scipy.ndimage.filters import gaussian_filter1d
 import config
 import microphone
 import dsp
-import sys
-
-visualization_type = sys.argv[1]
 
 _time_prev = time.time() * 1000.0
 """The previous time that the frames_per_second() function was called"""
@@ -174,7 +171,7 @@ def microphone_update(audio_samples):
         mel /= mel_gain.value
         mel = mel_smoothing.update(mel)
         # Map filterbank output onto LED strip
-        visualization_effect(mel)
+        visualize_spectrum(mel)
 
 
 # Number of audio samples to read every time frame
@@ -182,12 +179,6 @@ samples_per_frame = int(config.MIC_RATE / config.FPS)
 
 # Array containing the rolling audio sample window
 y_roll = np.random.rand(config.N_ROLLING_HISTORY, samples_per_frame) / 1e16
-
-visualization_type = visualize_spectrum
-"""Visualization effect to display on the LED strip"""
-
-
-visualization_effect = visualization_type
 
 if __name__ == '__main__':
     # Start listening to live audio stream
