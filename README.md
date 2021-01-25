@@ -1,3 +1,5 @@
+# Original repo: https://github.com/naztronaut/dancyPi-audio-reactive-led
+
 # Dancy Pi: Audio Reactive LEDs
 
 This repo is my implementation of Scott Lawson's work. I did my best to simplify the installation process. The original Readme text can be found below my updated Readme. 
