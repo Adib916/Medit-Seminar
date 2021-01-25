@@ -48,13 +48,12 @@ def _update_pi():
 
         strip._led_data[i] = int(rgb[i])
     _prev_pixels = np.copy(p)
-    print("r = " ,r)
-    print("g = ", g)
-    print("b = ", b)
-    print("\n")
-    print("\n")
+    # print("r = " ,r)
+    # print("g = ", g)
+    # print("b = ", b)
+    # print("\n")
+    # print("\n")
     strip.show()
-
 
 
 def update():

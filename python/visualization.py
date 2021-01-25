@@ -118,6 +118,12 @@ def visualize_spectrum(y):
     r = r_filt.update(y - common_mode.value)
     g = np.abs(diff)
     b = b_filt.update(np.copy(y))
+    print("r = ", r)
+    print("g = ", g)
+    print("b = ", b)
+    print("\n")
+    print("\n")
+
     # Mirror the color channels for symmetric output
     r = np.concatenate((r[::-1], r))
     g = np.concatenate((g[::-1], g))
