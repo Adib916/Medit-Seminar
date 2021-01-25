@@ -7,6 +7,14 @@ import config
 import microphone
 import dsp
 
+import midi
+from midi import MidiConnector
+from midi import ControlChange
+from midi import NoteOn
+from midi import Message
+
+conn = MidiConnector('/dev/serial0', 38400)
+
 _time_prev = time.time() * 1000.0
 """The previous time that the frames_per_second() function was called"""
 
@@ -116,6 +124,12 @@ def visualize_spectrum(y):
     r = r_filt.update(y - common_mode.value)
     g = np.abs(diff)
     b = b_filt.update(np.copy(y))
+
+    count = 0
+    if y[0] > 0.1:
+        count += 1
+        conn.write(Message(NoteOn(count, 69), 1))
+
     print("r = ", r)
     print("g = ", g)
     print("b = ", b)

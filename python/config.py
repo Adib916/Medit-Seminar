@@ -30,7 +30,7 @@ LED_INVERT = False
 SOFTWARE_GAMMA_CORRECTION = True
 """Set to True because Raspberry Pi doesn't use hardware dithering"""
 
-N_PIXELS = 16
+N_PIXELS = 80
 """Number of pixels in the LED strip (must match ESP8266 firmware)"""
 
 GAMMA_TABLE_PATH = os.path.join(os.path.dirname(__file__), 'gamma_table.npy')
