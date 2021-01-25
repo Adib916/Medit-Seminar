@@ -6,7 +6,6 @@ from scipy.ndimage.filters import gaussian_filter1d
 import config
 import microphone
 import dsp
-import led
 import sys
 
 visualization_type = sys.argv[1]
@@ -177,7 +176,6 @@ def microphone_update(audio_samples):
         mel = mel_smoothing.update(mel)
         # Map filterbank output onto LED strip
         output = visualization_effect(mel)
-        led.pixels = output
 
 
 # Number of audio samples to read every time frame
