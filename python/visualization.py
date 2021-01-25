@@ -97,65 +97,12 @@ g_filt = dsp.ExpFilter(np.tile(0.01, config.N_PIXELS // 2),
 b_filt = dsp.ExpFilter(np.tile(0.01, config.N_PIXELS // 2),
                        alpha_decay=0.1, alpha_rise=0.5)
 common_mode = dsp.ExpFilter(np.tile(0.01, config.N_PIXELS // 2),
-                       alpha_decay=0.99, alpha_rise=0.01)
+                            alpha_decay=0.99, alpha_rise=0.01)
 p_filt = dsp.ExpFilter(np.tile(1, (3, config.N_PIXELS // 2)),
                        alpha_decay=0.1, alpha_rise=0.99)
 p = np.tile(1.0, (3, config.N_PIXELS // 2))
 gain = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS),
                      alpha_decay=0.001, alpha_rise=0.99)
-
-
-def visualize_scroll(y):
-    """Effect that originates in the center and scrolls outwards"""
-    global p
-    y = y**2.0
-    gain.update(y)
-    y /= gain.value
-    y *= 255.0
-    r = int(np.max(y[:len(y) // 3]))
-    g = int(np.max(y[len(y) // 3: 2 * len(y) // 3]))
-    b = int(np.max(y[2 * len(y) // 3:]))
-    # Scrolling effect window
-    p[:, 1:] = p[:, :-1]
-    p *= 0.98
-    p = gaussian_filter1d(p, sigma=0.2)
-    # Create new color originating at the center
-    p[0, 0] = r
-    p[1, 0] = g
-    p[2, 0] = b
-    # Update the LED strip
-    return np.concatenate((p[:, ::-1], p), axis=1)
-
-
-def visualize_energy(y):
-    """Effect that expands from the center with increasing sound energy"""
-    global p
-    y = np.copy(y)
-    gain.update(y)
-    y /= gain.value
-    # Scale by the width of the LED strip
-    y *= float((config.N_PIXELS // 2) - 1)
-    # Map color channels according to energy in the different freq bands
-    scale = 0.9
-    r = int(np.mean(y[:len(y) // 3]**scale))
-    g = int(np.mean(y[len(y) // 3: 2 * len(y) // 3]**scale))
-    b = int(np.mean(y[2 * len(y) // 3:]**scale))
-    # Assign color to different frequency regions
-    p[0, :r] = 255.0
-    p[0, r:] = 0.0
-    p[1, :g] = 255.0
-    p[1, g:] = 0.0
-    p[2, :b] = 255.0
-    p[2, b:] = 0.0
-    p_filt.update(p)
-    p = np.round(p_filt.value)
-    # Apply substantial blur to smooth the edges
-    p[0, :] = gaussian_filter1d(p[0, :], sigma=4.0)
-    p[1, :] = gaussian_filter1d(p[1, :], sigma=4.0)
-    p[2, :] = gaussian_filter1d(p[2, :], sigma=4.0)
-    # Set the new pixel value
-    return np.concatenate((p[:, ::-1], p), axis=1)
-
 
 _prev_spectrum = np.tile(0.01, config.N_PIXELS // 2)
 
@@ -175,16 +122,16 @@ def visualize_spectrum(y):
     r = np.concatenate((r[::-1], r))
     g = np.concatenate((g[::-1], g))
     b = np.concatenate((b[::-1], b))
-    output = np.array([r, g,b]) * 255
+    output = np.array([r, g, b]) * 255
     return output
 
 
 fft_plot_filter = dsp.ExpFilter(np.tile(1e-1, config.N_FFT_BINS),
-                         alpha_decay=0.5, alpha_rise=0.99)
+                                alpha_decay=0.5, alpha_rise=0.99)
 mel_gain = dsp.ExpFilter(np.tile(1e-1, config.N_FFT_BINS),
                          alpha_decay=0.01, alpha_rise=0.99)
 mel_smoothing = dsp.ExpFilter(np.tile(1e-1, config.N_FFT_BINS),
-                         alpha_decay=0.5, alpha_rise=0.99)
+                              alpha_decay=0.5, alpha_rise=0.99)
 volume = dsp.ExpFilter(config.MIN_VOLUME_THRESHOLD,
                        alpha_decay=0.02, alpha_rise=0.02)
 fft_window = np.hamming(int(config.MIC_RATE / config.FPS) * config.N_ROLLING_HISTORY)
@@ -199,7 +146,7 @@ def microphone_update(audio_samples):
     y_roll[:-1] = y_roll[1:]
     y_roll[-1, :] = np.copy(y)
     y_data = np.concatenate(y_roll, axis=0).astype(np.float32)
-    
+
     vol = np.max(np.abs(y_data))
     if vol < config.MIN_VOLUME_THRESHOLD:
         print('No audio input. Volume below threshold. Volume:', vol)
@@ -227,12 +174,6 @@ def microphone_update(audio_samples):
         output = visualization_effect(mel)
         led.pixels = output
         led.update()
-   
-    if config.DISPLAY_FPS:
-        fps = frames_per_second()
-        if time.time() - 0.5 > prev_fps_update:
-            prev_fps_update = time.time()
-            print('FPS {:.0f} / {:.0f}'.format(fps, config.FPS))
 
 
 # Number of audio samples to read every time frame
@@ -241,95 +182,11 @@ samples_per_frame = int(config.MIC_RATE / config.FPS)
 # Array containing the rolling audio sample window
 y_roll = np.random.rand(config.N_ROLLING_HISTORY, samples_per_frame) / 1e16
 
-if sys.argv[1] == "spectrum":
-        visualization_type = visualize_spectrum
-elif sys.argv[1] == "energy":
-        visualization_type = visualize_energy
-elif sys.argv[1] == "scroll":
-        visualization_type = visualize_scroll
-else:
-        visualization_type = visualize_spectrum
-
-visualization_effect = visualization_type
+visualization_type = visualize_spectrum
 """Visualization effect to display on the LED strip"""
 
 
 if __name__ == '__main__':
-d_plot.setRange(yRange=[-5, 260])
-        led_plot.disableAutoRange(axis=pg.ViewBox.YAxis)
-        # Pen for each of the color channel curves
-        r_pen = pg.mkPen((255, 30, 30, 200), width=4)
-        g_pen = pg.mkPen((30, 255, 30, 200), width=4)
-        b_pen = pg.mkPen((30, 30, 255, 200), width=4)
-        # Color channel curves
-        r_curve = pg.PlotCurveItem(pen=r_pen)
-        g_curve = pg.PlotCurveItem(pen=g_pen)
-        b_curve = pg.PlotCurveItem(pen=b_pen)
-        # Define x data
-        x_data = np.array(range(1, config.N_PIXELS + 1))
-        r_curve.setData(x=x_data, y=x_data*0)
-        g_curve.setData(x=x_data, y=x_data*0)
-        b_curve.setData(x=x_data, y=x_data*0)
-        # Add curves to plot
-        led_plot.addItem(r_curve)
-        led_plot.addItem(g_curve)
-        led_plot.addItem(b_curve)
-        # Frequency range label
-        freq_label = pg.LabelItem('')
-        # Frequency slider
-        def freq_slider_change(tick):
-            minf = freq_slider.tickValue(0)**2.0 * (config.MIC_RATE / 2.0)
-            maxf = freq_slider.tickValue(1)**2.0 * (config.MIC_RATE / 2.0)
-            t = 'Frequency range: {:.0f} - {:.0f} Hz'.format(minf, maxf)
-            freq_label.setText(t)
-            config.MIN_FREQUENCY = minf
-            config.MAX_FREQUENCY = maxf
-            dsp.create_mel_bank()
-        freq_slider = pg.TickSliderItem(orientation='bottom', allowAdd=False)
-        freq_slider.addTick((config.MIN_FREQUENCY / (config.MIC_RATE / 2.0))**0.5)
-        freq_slider.addTick((config.MAX_FREQUENCY / (config.MIC_RATE / 2.0))**0.5)
-        freq_slider.tickMoveFinished = freq_slider_change
-        freq_label.setText('Frequency range: {} - {} Hz'.format(
-            config.MIN_FREQUENCY,
-            config.MAX_FREQUENCY))
-        # Effect selection
-        active_color = '#16dbeb'
-        inactive_color = '#FFFFFF'
-        def energy_click(x):
-            global visualization_effect
-            visualization_effect = visualize_energy
-            energy_label.setText('Energy', color=active_color)
-            scroll_label.setText('Scroll', color=inactive_color)
-            spectrum_label.setText('Spectrum', color=inactive_color)
-        def scroll_click(x):
-            global visualization_effect
-            visualization_effect = visualize_scroll
-            energy_label.setText('Energy', color=inactive_color)
-            scroll_label.setText('Scroll', color=active_color)
-            spectrum_label.setText('Spectrum', color=inactive_color)
-        def spectrum_click(x):
-            global visualization_effect
-            visualization_effect = visualize_spectrum
-            energy_label.setText('Energy', color=inactive_color)
-            scroll_label.setText('Scroll', color=inactive_color)
-            spectrum_label.setText('Spectrum', color=active_color)
-        # Create effect "buttons" (labels with click event)
-        energy_label = pg.LabelItem('Energy')
-        scroll_label = pg.LabelItem('Scroll')
-        spectrum_label = pg.LabelItem('Spectrum')
-        energy_label.mousePressEvent = energy_click
-        scroll_label.mousePressEvent = scroll_click
-        spectrum_label.mousePressEvent = spectrum_click
-        energy_click(0)
-        # Layout
-        layout.nextRow()
-        layout.addItem(freq_label, colspan=3)
-        layout.nextRow()
-        layout.addItem(freq_slider, colspan=3)
-        layout.nextRow()
-        layout.addItem(energy_label)
-        layout.addItem(scroll_label)
-        layout.addItem(spectrum_label)
     # Initialize LEDs
     led.update()
     # Start listening to live audio stream
