@@ -13,6 +13,8 @@ from midi import ControlChange
 from midi import NoteOn
 from midi import Message
 
+count = 0
+
 conn = MidiConnector('/dev/serial0', 38400)
 
 _time_prev = time.time() * 1000.0
@@ -113,7 +115,7 @@ _prev_spectrum = np.tile(0.01, config.N_PIXELS // 2)
 
 def visualize_spectrum(y):
     """Effect that maps the Mel filterbank frequencies onto the LED strip"""
-    global _prev_spectrum
+    global _prev_spectrum, count
     y = np.copy(interpolate(y, config.N_PIXELS // 2))
     print("y = ", y)
     print("\n")
@@ -125,18 +127,19 @@ def visualize_spectrum(y):
     g = np.abs(diff)
     b = b_filt.update(np.copy(y))
 
-    count = 0
-    if y[0] > 0.1:
+    if y[0] > 1:
         if count > 31:
             count = 0
         count += 1
+        print("count is ", count)
+        print("\n")
         conn.write(Message(NoteOn(count, 69), 1))
 
-    print("r = ", r)
-    print("g = ", g)
-    print("b = ", b)
-    print("\n")
-    print("\n")
+    # print("r = ", r)
+    # print("g = ", g)
+    # print("b = ", b)
+    # print("\n")
+    # print("\n")
 
 
 fft_plot_filter = dsp.ExpFilter(np.tile(1e-1, config.N_FFT_BINS),
