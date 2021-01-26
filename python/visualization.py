@@ -127,6 +127,8 @@ def visualize_spectrum(y):
 
     count = 0
     if y[0] > 0.1:
+        if count > 31:
+            count = 0
         count += 1
         conn.write(Message(NoteOn(count, 69), 1))
 
