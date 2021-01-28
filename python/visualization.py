@@ -7,9 +7,7 @@ import config
 import microphone
 import dsp
 
-import midi
 from midi import MidiConnector
-from midi import ControlChange
 from midi import NoteOn
 from midi import Message
 
@@ -96,36 +94,25 @@ def interpolate(y, new_length):
     return z
 
 
-r_filt = dsp.ExpFilter(np.tile(0.01, config.N_PIXELS // 2),
-                       alpha_decay=0.2, alpha_rise=0.99)
-g_filt = dsp.ExpFilter(np.tile(0.01, config.N_PIXELS // 2),
-                       alpha_decay=0.05, alpha_rise=0.3)
-b_filt = dsp.ExpFilter(np.tile(0.01, config.N_PIXELS // 2),
-                       alpha_decay=0.1, alpha_rise=0.5)
-common_mode = dsp.ExpFilter(np.tile(0.01, config.N_PIXELS // 2),
+common_mode = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS // 2),
                             alpha_decay=0.99, alpha_rise=0.01)
-p_filt = dsp.ExpFilter(np.tile(1, (3, config.N_PIXELS // 2)),
+p_filt = dsp.ExpFilter(np.tile(1, (3, config.N_FFT_BINS // 2)),
                        alpha_decay=0.1, alpha_rise=0.99)
-p = np.tile(1.0, (3, config.N_PIXELS // 2))
+p = np.tile(1.0, (3, config.N_FFT_BINS // 2))
 gain = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS),
                      alpha_decay=0.001, alpha_rise=0.99)
 
-_prev_spectrum = np.tile(0.01, config.N_PIXELS // 2)
+_prev_spectrum = np.tile(0.01, config.N_FFT_BINS // 2)
 
 
 def visualize_spectrum(y):
     """Effect that maps the Mel filterbank frequencies onto the LED strip"""
     global _prev_spectrum, count
-    y = np.copy(interpolate(y, config.N_PIXELS // 2))
+    y = np.copy(interpolate(y, config.N_FFT_BINS // 2))
     print("y = ", y)
     print("\n")
     common_mode.update(y)
-    diff = y - _prev_spectrum
     _prev_spectrum = np.copy(y)
-    # Color channel mappings
-    r = r_filt.update(y - common_mode.value)
-    g = np.abs(diff)
-    b = b_filt.update(np.copy(y))
 
     if y[0] > 1:
         if count > 31:
@@ -134,12 +121,6 @@ def visualize_spectrum(y):
         print("count is ", count)
         print("\n")
         conn.write(Message(NoteOn(count, 69), 1))
-
-    # print("r = ", r)
-    # print("g = ", g)
-    # print("b = ", b)
-    # print("\n")
-    # print("\n")
 
 
 fft_plot_filter = dsp.ExpFilter(np.tile(1e-1, config.N_FFT_BINS),
