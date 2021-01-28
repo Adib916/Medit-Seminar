@@ -6,6 +6,7 @@ import melbank
 
 class ExpFilter:
     """Simple exponential smoothing filter"""
+
     def __init__(self, val=0.0, alpha_decay=0.5, alpha_rise=0.5):
         """Small rise / decay factors = more smoothing"""
         assert 0.0 < alpha_decay < 1.0, 'Invalid decay smoothing factor'
@@ -47,6 +48,8 @@ def create_mel_bank():
                                                freq_max=config.MAX_FREQUENCY,
                                                num_fft_bands=samples,
                                                sample_rate=config.MIC_RATE)
+
+
 samples = None
 mel_y = None
 mel_x = None
