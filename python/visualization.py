@@ -94,18 +94,18 @@ def interpolate(y, new_length):
     return z
 
 
-common_mode = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS // 2),
+common_mode = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS),
                             alpha_decay=0.99, alpha_rise=0.01)
 gain = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS),
                      alpha_decay=0.001, alpha_rise=0.99)
 
-_prev_spectrum = np.tile(0.01, config.N_FFT_BINS // 2)
+_prev_spectrum = np.tile(0.01, config.N_FFT_BINS)
 
 
 def visualize_spectrum(y):
     """Effect that maps the Mel filterbank frequencies onto the LED strip"""
     global _prev_spectrum, count
-    y = np.copy(interpolate(y, config.N_FFT_BINS // 2))
+#    y = np.copy(interpolate(y, config.N_FFT_BINS // 2))
     print("y = ", y)
     print("\n")
     common_mode.update(y)
