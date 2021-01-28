@@ -1,20 +1,12 @@
-"""Settings for audio reactive LED strip"""
 from __future__ import print_function
 from __future__ import division
 import os
 
 DEVICE = 'pi'
 
-"""Device used to control LED strip. Must be 'pi',  'esp8266' or 'blinkstick'
-
-'esp8266' means that you are using an ESP8266 module to control the LED strip
-and commands will be sent to the ESP8266 over WiFi.
-
+"""Device used to control LED strip. Must be 'pi'
 'pi' means that you are using a Raspberry Pi as a standalone unit to process
 audio input and control the LED strip directly.
-
-'blinkstick' means that a BlinkstickPro is connected to this PC which will be used
-to control the leds connected to it.
 """
 
 LED_PIN = 18
