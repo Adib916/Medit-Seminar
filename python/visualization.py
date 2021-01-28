@@ -48,52 +48,6 @@ def frames_per_second():
     return _fps.update(1000.0 / dt)
 
 
-def memoize(function):
-    """Provides a decorator for memoizing functions"""
-    from functools import wraps
-    memo = {}
-
-    @wraps(function)
-    def wrapper(*args):
-        if args in memo:
-            return memo[args]
-        else:
-            rv = function(*args)
-            memo[args] = rv
-            return rv
-    return wrapper
-
-
-@memoize
-def _normalized_linspace(size):
-    return np.linspace(0, 1, size)
-
-
-def interpolate(y, new_length):
-    """Intelligently resizes the array by linearly interpolating the values
-
-    Parameters
-    ----------
-    y : np.array
-        Array that should be resized
-
-    new_length : int
-        The length of the new interpolated array
-
-    Returns
-    -------
-    z : np.array
-        New array with length of new_length that contains the interpolated
-        values of y.
-    """
-    if len(y) == new_length:
-        return y
-    x_old = _normalized_linspace(len(y))
-    x_new = _normalized_linspace(new_length)
-    z = np.interp(x_new, x_old, y)
-    return z
-
-
 common_mode = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS),
                             alpha_decay=0.99, alpha_rise=0.01)
 gain = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS),
@@ -105,7 +59,6 @@ _prev_spectrum = np.tile(0.01, config.N_FFT_BINS)
 def visualize_spectrum(y):
     """Effect that maps the Mel filterbank frequencies onto the LED strip"""
     global _prev_spectrum, count
-#    y = np.copy(interpolate(y, config.N_FFT_BINS // 2))
     print("y = ", y)
     print("\n")
     common_mode.update(y)
