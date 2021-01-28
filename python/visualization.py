@@ -94,18 +94,18 @@ def interpolate(y, new_length):
     return z
 
 
-common_mode = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS // 2),
+common_mode = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS),
                             alpha_decay=0.99, alpha_rise=0.01)
 gain = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS),
                      alpha_decay=0.001, alpha_rise=0.99)
 
-_prev_spectrum = np.tile(0.01, config.N_FFT_BINS // 2)
+_prev_spectrum = np.tile(0.01, config.N_FFT_BINS)
 
 
 def visualize_spectrum(y):
     """Effect that maps the Mel filterbank frequencies onto the LED strip"""
     global _prev_spectrum, count
-    y = np.copy(interpolate(y, config.N_FFT_BINS // 2))
+    y = np.copy(interpolate(y, config.N_FFT_BINS))
     print("y = ", y)
     print("\n")
     common_mode.update(y)
@@ -149,7 +149,7 @@ def microphone_update(audio_samples):
         # Pad with zeros until the next power of two
         y_data *= fft_window
         y_padded = np.pad(y_data, (0, N_zeros), mode='constant')
-        YS = np.abs(np.fft.rfft(y_padded)[:N // 2])
+        YS = np.abs(np.fft.rfft(y_padded)[:N])
         # Construct a Mel filterbank from the FFT data
         mel = np.atleast_2d(YS).T * dsp.mel_y.T
         # Scale data to values more suitable for visualization
