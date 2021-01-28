@@ -151,6 +151,7 @@ def microphone_update(audio_samples):
         y_padded = np.pad(y_data, (0, N_zeros), mode='constant')
         YS = np.abs(np.fft.rfft(y_padded)[:N // 2])
         # Construct a Mel filterbank from the FFT data
+        #    ".T" means Transpose
         mel = np.atleast_2d(YS).T * dsp.mel_y.T
         # Scale data to values more suitable for visualization
         # mel = np.sum(mel, axis=0)
