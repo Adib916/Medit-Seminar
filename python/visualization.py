@@ -91,9 +91,10 @@ def microphone_update(audio_samples):
         YS = np.abs(np.fft.rfft(y_padded)[:N // 2])
         # Construct a Mel filterbank from the FFT data
         #    ".T" means Transpose
+        #   "dsp.mel_y" is transformation matrix
+        #   mel is the fft transformed to the mel spectrum
         mel = np.atleast_2d(YS).T * dsp.mel_y.T
         # Scale data to values more suitable for visualization
-        # mel = np.sum(mel, axis=0)
         mel = np.sum(mel, axis=0)
         mel = mel**2.0
         # Gain normalization
