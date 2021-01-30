@@ -78,8 +78,8 @@ def microphone_update(audio_samples):
         with open('logFFT.txt', 'a+') as file:
             file.write("%s\n" % (YS))
 
-        print("y = ", y)
-        print("\n")
+        # print("y = ", y)
+        # print("\n")
         common_mode.update(y)
         _prev_spectrum = np.copy(y)
 
