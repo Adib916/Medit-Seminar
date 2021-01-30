@@ -56,6 +56,8 @@ def microphone_update(audio_samples):
     global y_roll, prev_rms, prev_exp, prev_fps_update, _prev_spectrum, count
     # Normalize samples between 0 and 1
     y = audio_samples / 2.0**15
+    with open('logAudio.txt', 'a+') as file:
+        file.write("%s\n" % (y))
     # Construct a rolling window of audio samples
     y_roll[:-1] = y_roll[1:]
     y_roll[-1, :] = np.copy(y)
@@ -73,7 +75,7 @@ def microphone_update(audio_samples):
         y_padded = np.pad(y_data, (0, N_zeros), mode='constant')
         YS = np.abs(np.fft.rfft(y_padded)[:N // 2])
 
-        with open('log.txt', 'a+') as file:
+        with open('logFFT.txt', 'a+') as file:
             file.write("%s\n" % (YS))
 
         print("y = ", y)
