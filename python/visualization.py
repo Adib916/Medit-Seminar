@@ -43,19 +43,6 @@ _prev_spectrum = np.tile(0.01, config.N_FFT_BINS)
 
 
 def visualize_spectrum(y):
-    global _prev_spectrum, count
-    print("y = ", y)
-    print("\n")
-    common_mode.update(y)
-    _prev_spectrum = np.copy(y)
-
-    if y[0] > 1:
-        if count > 31:
-            count = 0
-        count += 1
-        print("count is ", count)
-        print("\n")
-        conn.write(Message(NoteOn(count, 69), 1))
 
 
 mel_gain = dsp.ExpFilter(np.tile(1e-1, config.N_FFT_BINS),
@@ -69,7 +56,7 @@ prev_fps_update = time.time()
 
 
 def microphone_update(audio_samples):
-    global y_roll, prev_rms, prev_exp, prev_fps_update
+    global y_roll, prev_rms, prev_exp, prev_fps_update, _prev_spectrum, count
     # Normalize samples between 0 and 1
     y = audio_samples / 2.0**15
     # Construct a rolling window of audio samples
@@ -88,20 +75,22 @@ def microphone_update(audio_samples):
         y_data *= fft_window
         y_padded = np.pad(y_data, (0, N_zeros), mode='constant')
         YS = np.abs(np.fft.rfft(y_padded)[:N // 2])
-        # Construct a Mel filterbank from the FFT data
-        #    ".T" means Transpose
-        #   "dsp.mel_y" is transformation matrix
-        #   mel is the fft transformed to the mel spectrum
-        mel = np.atleast_2d(YS).T * dsp.mel_y.T
-        # Scale data to values more suitable for visualization
-        mel = np.sum(mel, axis=0)
-        mel = mel**2.0
-        # Gain normalization
-        mel_gain.update(np.max(gaussian_filter1d(mel, sigma=1.0)))
-        mel /= mel_gain.value
-        mel = mel_smoothing.update(mel)
-        # Map filterbank output onto LED strip
-        visualize_spectrum(mel)
+
+        with open('log.txt', 'a+') as file:
+            file.write("%s\n" % (YS))
+
+        print("y = ", y)
+        print("\n")
+        common_mode.update(y)
+        _prev_spectrum = np.copy(y)
+
+        # if YS[0] > 1:
+        #     if count > 31:
+        #         count = 0
+        #     count += 1
+        #     print("count is ", count)
+        #     print("\n")
+        #     conn.write(Message(NoteOn(count, 69), 1))
 
 
 # Number of audio samples to read every time frame
