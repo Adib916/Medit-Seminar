@@ -42,9 +42,6 @@ gain = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS),
 _prev_spectrum = np.tile(0.01, config.N_FFT_BINS)
 
 
-def visualize_spectrum(y):
-
-
 mel_gain = dsp.ExpFilter(np.tile(1e-1, config.N_FFT_BINS),
                          alpha_decay=0.01, alpha_rise=0.99)
 mel_smoothing = dsp.ExpFilter(np.tile(1e-1, config.N_FFT_BINS),
