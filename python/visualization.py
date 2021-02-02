@@ -119,13 +119,13 @@ def microphone_update(audio_samples):
 
 def thresholding_algo(CurrentValue):
     global filteredY, avgFilter, stdFilter, count
-
+    print("Y0 is ", CurrentValue)
     if abs(CurrentValue - avgFilter) > config.THRESHOLD * stdFilter:
         if CurrentValue > avgFilter:
             if count > 31:
                 count = 0
             count += 1
-            print("count is ", count)
+            print("___________________________________________________________________________count is ", count)
             print("\n")
             conn.write(Message(NoteOn(count, 69), 1))
         filteredTmp = config.INFLUENCE * CurrentValue + (1 - config.INFLUENCE) * filteredY[-1]
