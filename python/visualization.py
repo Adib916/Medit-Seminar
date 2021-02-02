@@ -120,7 +120,7 @@ def microphone_update(audio_samples):
 def thresholding_algo(CurrentValue):
     global filteredY, avgFilter, stdFilter, count
 
-    if abs(CurrentValue - avgFilter) > threshold * stdFilter:
+    if abs(CurrentValue - avgFilter) > config.THRESHOLD * stdFilter:
         if CurrentValue > avgFilter:
             if count > 31:
                 count = 0
