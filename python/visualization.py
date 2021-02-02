@@ -112,15 +112,12 @@ def microphone_update(audio_samples):
             avgFilter = np.mean(y_roll_fft[0:config.N_ROLLING_FFT_HISTORY])
             stdFilter = np.std(y_roll_fft[0:config.N_ROLLING_FFT_HISTORY])
         elif iteration > config.N_ROLLING_FFT_HISTORY:
-            thresholding_algo(y[0])
+            threshold_calc(y[0])
         else:
             pass
 
 
-'''https://stackoverflow.com/questions/22583391/peak-signal-detection-in-realtime-timeseries-data/43512887#43512887'''
-
-
-def thresholding_algo(CurrentValue):
+def threshold_calc(CurrentValue):
     global filteredY, avgFilter, stdFilter, count, signal_time, used
     # print("Y0 is ", CurrentValue)
     # print("Y0 - - avgFilter ", CurrentValue-avgFilter)
