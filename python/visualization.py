@@ -61,8 +61,8 @@ def microphone_update(audio_samples):
 
     # Normalize samples between 0 and 1
     y = audio_samples / 2.0**15
-    with open('logAudio.txt', 'a+') as file:
-        file.write("%s\n" % (y))
+    # with open('logAudio.txt', 'a+') as file:
+    #     file.write("%s\n" % (y))
     # Construct a rolling window of audio samples
     y_roll[:-1] = y_roll[1:]
     y_roll[-1, :] = np.copy(y)
@@ -80,8 +80,8 @@ def microphone_update(audio_samples):
         y_padded = np.pad(y_data, (0, N_zeros), mode='constant')
         YS = np.abs(np.fft.rfft(y_padded)[:N // 2])
 
-        with open('logFFT.txt', 'a+') as file:
-            file.write("%s\n" % (YS))
+        # with open('logFFT.txt', 'a+') as file:
+        #     file.write("%s\n" % (YS))
 
         # Construct a Mel filterbank from the FFT data
         mel = np.atleast_2d(YS).T * dsp.mel_y.T
@@ -112,6 +112,9 @@ def microphone_update(audio_samples):
             thresholding_algo(y[0])
         else:
             pass
+
+
+'''https://stackoverflow.com/questions/22583391/peak-signal-detection-in-realtime-timeseries-data/43512887#43512887'''
 
 
 def thresholding_algo(CurrentValue):
