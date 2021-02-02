@@ -132,6 +132,7 @@ def thresholding_algo(CurrentValue):
 
     else:
         filteredTmp = CurrentValue
+        print("\n")
 
     filteredY[:-1] = filteredY[1:]
     filteredY[-1] = filteredTmp
