@@ -14,6 +14,7 @@ from midi import Message
 count = 0
 i = 1
 
+
 conn = MidiConnector('/dev/serial0', 38400)
 
 _time_prev = time.time() * 1000.0
@@ -54,7 +55,7 @@ prev_fps_update = time.time()
 
 
 def microphone_update(audio_samples):
-    global y_roll, prev_rms, prev_exp, prev_fps_update, _prev_spectrum, count, i
+    global y_roll, prev_rms, prev_exp, prev_fps_update, _prev_spectrum, count, i, threshold, influence
     # Normalize samples between 0 and 1
     y = audio_samples / 2.0**15
     with open('logAudio.txt', 'a+') as file:
@@ -100,21 +101,39 @@ def microphone_update(audio_samples):
         y_roll_fft[:-1] = y_roll_fft[1:]
         y_roll_fft[-1] = y[0]
 
-        Threshold = np.sum(y_roll_fft, axis=0)/np.size(y_roll_fft)
-
-        print("y = ", y[0])
-        print("\n")
-
-        print("Threshold = ", Threshold)
-        print("\n")
+        thresholding_algo(y[0])
 
         if y[0] > Threshold:
+
+
+y_roll_fft[:-1] = y_roll_fft[1:]
+y_roll_fft[-1] = y[0]
+filteredY = np.array(y_roll_fft)
+avgFilter = np.mean(y[0:N_ROLLING_FFT_HISTORY])
+stdFilter = np.std(y[0:N_ROLLING_FFT_HISTORY])
+
+
+def thresholding_algo(CurrentValue):
+    global filteredY, avgFilter, stdFilter
+
+    if abs(CurrentValue - avgFilter) > threshold * stdFilter:
+        if CurrentValue > avgFilter:
             if count > 31:
                 count = 0
             count += 1
             print("count is ", count)
             print("\n")
             conn.write(Message(NoteOn(count, 69), 1))
+        filteredTmp = config.INFLUENCE * CurrentValue + (1 - config.INFLUENCE) * filteredY[-1]
+
+    else:
+        filteredTmp = CurrentValue
+
+    filteredY[:-1] = filteredY[1:]
+    filteredY[-1] = filteredTmp
+
+    avgFilter = np.mean(filteredY[:(config.N_ROLLING_FFT_HISTORY)])
+    stdFilter = np.std(filteredY[:(config.N_ROLLING_FFT_HISTORY)])
 
 
 # Number of audio samples to read every time frame
