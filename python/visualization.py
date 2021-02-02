@@ -59,7 +59,7 @@ def microphone_update(audio_samples):
     global filteredY, avgFilter, stdFilter, signal_time
     iteration += 1
 
-    time.sleep(0.01)
+    time.sleep(0.1)
 
     # Normalize samples between 0 and 1
     y = audio_samples / 2.0**15
