@@ -118,7 +118,7 @@ def microphone_update(audio_samples):
 
 
 def thresholding_algo(CurrentValue):
-    global filteredY, avgFilter, stdFilter, count
+    global filteredY, avgFilter, stdFilter, count, signal_time
     # print("Y0 is ", CurrentValue)
     # print("Y0 - - avgFilter ", CurrentValue-avgFilter)
     # print("config.THRESHOLD * stdFilter is ", config.THRESHOLD * stdFilter)
@@ -132,12 +132,8 @@ def thresholding_algo(CurrentValue):
             print("\n")
             print("\n")
 
-            try:
-                print("--- %s seconds ---" % (time.time() - signal_time))
-            except NameError:
-                pass
             conn.write(Message(NoteOn(count, 69), 1))
-            signal_time = time.time()
+            print("--- %s seconds ---" % (time.time() - signal_time))
 
         filteredTmp = config.INFLUENCE * CurrentValue + (1 - config.INFLUENCE) * filteredY[-1]
 
