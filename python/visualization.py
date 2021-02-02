@@ -105,6 +105,9 @@ def microphone_update(audio_samples):
         print("y = ", y[0])
         print("\n")
 
+        print("y = ", Threshold)
+        print("\n")
+
         if y[0] > Threshold:
             if count > 31:
                 count = 0
