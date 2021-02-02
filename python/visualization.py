@@ -89,6 +89,62 @@ def microphone_update(audio_samples):
         mel /= mel_gain.value
         mel = mel_smoothing.update(mel)
 
+        # if i == 1:
+        #     for k in range(0, config.N_ROLLING_FFT_HISTORY - 1):
+        #         y_roll_fft[k] = YS[config.MIN_FREQUENCY: (config.MAX_FREQUENCY)]
+        #         i = 0
+        #
+        # # Rolling FFT window
+        # y_roll_fft[:-1] = y_roll_fft[1:]
+        # y_roll_fft[-1, :] = np.copy(YS[config.MIN_FREQUENCY: (config.MAX_FREQUENCY)])
+        #
+        # YS_data = np.concatenate(y_roll_fft, axis=0).astype(np.float32)
+        #
+        # LowHZ = FFT_LowHZ.update(YS_data)
+        # clipped_data = LowHZ[(LowHZ > 0.08)]
+        # print(np.size(clipped_data))
+        #
+        # print("Max of LowHZ is ", np.amax(LowHZ))
+        # print("Max of YS is ", np.amax(YS[config.MIN_FREQUENCY: (config.MAX_FREQUENCY)]))
+        #
+        # if np.size(clipped_data) != 0:
+        #     k = find_peaks(clipped_data)
+        #     Position = k[0]
+        #     print(Position)
+        #
+        #     # Sum = 0
+        #     # for j in Position:
+        #     #     Sum += clipped_data[j]
+        #     # ThresholdTest = Sum/np.size(Position)
+        #     # print("ThresholdTest is ", ThresholdTest)
+        #     #
+        #     # for g in Position:
+        #     #     clipped_data[g] *= 100
+        #     #
+        #     # Threshold = np.sum(clipped_data, axis=1)/(np.size(clipped_data))
+        #
+        #     # for h in Position:
+        #     #     clipped_data[h] = 0
+        #
+        #     Threshold = np.sum(clipped_data)/(np.size(clipped_data))
+        #
+        #     if np.amax(YS[config.MIN_FREQUENCY: (config.MAX_FREQUENCY)]) > Threshold:
+        #         if count > 31:
+        #             count = 0
+        #         count += 1
+        #         print("Threshold is ", Threshold)
+        #         # print("count is ", count)
+        #         print("Beat")
+        #         print("\n")
+        #         print("\n")
+        #         conn.write(Message(NoteOn(count, 69), 1))
+        #
+        #     else:
+        #         print("Threshold is ", Threshold)
+        #         print("\n")
+        #         print("\n")
+        #         pass
+
         # print("y = ", y)
         # print("\n")
         common_mode.update(y)
