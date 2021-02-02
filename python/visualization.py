@@ -55,9 +55,10 @@ prev_fps_update = time.time()
 
 
 def microphone_update(audio_samples):
-    signal_time = time.time()
     global y_roll, prev_rms, prev_exp, prev_fps_update, _prev_spectrum, count, i, threshold, influence, iteration
     global filteredY, avgFilter, stdFilter, signal_time
+
+    signal_time = time.time()
     iteration += 1
 
     # Normalize samples between 0 and 1
