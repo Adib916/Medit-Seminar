@@ -1,7 +1,7 @@
 '''Documentation found in Documentation/config.txt '''
 MIC_RATE = 48000
 
-FPS = 25
+FPS = 10
 
 MIN_FREQUENCY = 50
 
@@ -11,7 +11,7 @@ N_FFT_BINS = 24
 
 N_ROLLING_HISTORY = 2
 
-N_ROLLING_FFT_HISTORY = 50
+N_ROLLING_FFT_HISTORY = 20
 
 MIN_VOLUME_THRESHOLD = 1e-7
 
