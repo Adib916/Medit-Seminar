@@ -129,7 +129,7 @@ def thresholding_algo(CurrentValue):
             if count > 31:
                 count = 0
             count += 1
-            print("___________________________________________________________________________count is ", count)
+            print("count: ", count)
             print("\n")
             print("\n")
             print("\n")
