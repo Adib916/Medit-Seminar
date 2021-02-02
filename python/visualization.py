@@ -37,13 +37,8 @@ def frames_per_second():
     return _fps.update(1000.0 / dt)
 
 
-common_mode = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS),
-                            alpha_decay=0.99, alpha_rise=0.01)
 gain = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS),
                      alpha_decay=0.001, alpha_rise=0.99)
-
-_prev_spectrum = np.tile(0.01, config.N_FFT_BINS)
-
 
 mel_gain = dsp.ExpFilter(np.tile(1e-1, config.N_FFT_BINS),
                          alpha_decay=0.01, alpha_rise=0.99)
@@ -52,11 +47,10 @@ mel_smoothing = dsp.ExpFilter(np.tile(1e-1, config.N_FFT_BINS),
 volume = dsp.ExpFilter(config.MIN_VOLUME_THRESHOLD,
                        alpha_decay=0.02, alpha_rise=0.02)
 fft_window = np.hamming(int(config.MIC_RATE / config.FPS) * config.N_ROLLING_HISTORY)
-prev_fps_update = time.time()
 
 
 def microphone_update(audio_samples):
-    global y_roll, prev_rms, prev_exp, prev_fps_update, _prev_spectrum, count, i, threshold, influence, iteration
+    global y_roll, prev_rms, prev_exp, count, i, threshold, influence, iteration
     global filteredY, avgFilter, stdFilter, signal_time
     iteration += 1
 
