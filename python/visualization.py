@@ -14,6 +14,7 @@ from midi import Message
 count = 0
 i = 1
 iteration = 0
+used = 0
 
 conn = MidiConnector('/dev/serial0', 38400)
 
@@ -120,7 +121,7 @@ def microphone_update(audio_samples):
 
 
 def thresholding_algo(CurrentValue):
-    global filteredY, avgFilter, stdFilter, count, signal_time
+    global filteredY, avgFilter, stdFilter, count, signal_time, used
     # print("Y0 is ", CurrentValue)
     # print("Y0 - - avgFilter ", CurrentValue-avgFilter)
     # print("config.THRESHOLD * stdFilter is ", config.THRESHOLD * stdFilter)
@@ -134,11 +135,13 @@ def thresholding_algo(CurrentValue):
             print("\n")
             print("\n")
 
-            conn.write(Message(NoteOn(count, 69), 1))
-
+            if used == 0:
+                conn.write(Message(NoteOn(count, 69), 1))
+                used = 1
         filteredTmp = config.INFLUENCE * CurrentValue + (1 - config.INFLUENCE) * filteredY[-1]
 
     else:
+        used = 0
         filteredTmp = CurrentValue
         print("\n")
 
