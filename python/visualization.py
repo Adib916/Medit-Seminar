@@ -57,9 +57,9 @@ prev_fps_update = time.time()
 def microphone_update(audio_samples):
     global y_roll, prev_rms, prev_exp, prev_fps_update, _prev_spectrum, count, i, threshold, influence, iteration
     global filteredY, avgFilter, stdFilter, signal_time
-
-    signal_time = time.time()
     iteration += 1
+
+    time.sleep(0.01)
 
     # Normalize samples between 0 and 1
     y = audio_samples / 2.0**15
@@ -135,7 +135,6 @@ def thresholding_algo(CurrentValue):
             print("\n")
 
             conn.write(Message(NoteOn(count, 69), 1))
-            print("--- %s seconds ---" % (time.time() - signal_time))
 
         filteredTmp = config.INFLUENCE * CurrentValue + (1 - config.INFLUENCE) * filteredY[-1]
 
