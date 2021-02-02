@@ -142,8 +142,8 @@ def thresholding_algo(CurrentValue):
     filteredY[:-1] = filteredY[1:]
     filteredY[-1] = filteredTmp
 
-    avgFilter = abs(np.mean(filteredY[:(config.N_ROLLING_FFT_HISTORY)]))
-    stdFilter = abs(np.std(filteredY[:(config.N_ROLLING_FFT_HISTORY)]))
+    avgFilter = np.mean(filteredY[:(config.N_ROLLING_FFT_HISTORY)])
+    stdFilter = np.std(filteredY[:(config.N_ROLLING_FFT_HISTORY)])
 
 
 # Number of audio samples to read every time frame
