@@ -12,6 +12,7 @@ from midi import NoteOn
 from midi import Message
 
 count = 0
+i = 1
 
 conn = MidiConnector('/dev/serial0', 38400)
 
@@ -53,7 +54,7 @@ prev_fps_update = time.time()
 
 
 def microphone_update(audio_samples):
-    global y_roll, prev_rms, prev_exp, prev_fps_update, _prev_spectrum, count
+    global y_roll, prev_rms, prev_exp, prev_fps_update, _prev_spectrum, count, i
     # Normalize samples between 0 and 1
     y = audio_samples / 2.0**15
     with open('logAudio.txt', 'a+') as file:
@@ -88,75 +89,29 @@ def microphone_update(audio_samples):
         mel_gain.update(np.max(gaussian_filter1d(mel, sigma=1.0)))
         mel /= mel_gain.value
         mel = mel_smoothing.update(mel)
+        y = mel
 
-        # if i == 1:
-        #     for k in range(0, config.N_ROLLING_FFT_HISTORY - 1):
-        #         y_roll_fft[k] = YS[config.MIN_FREQUENCY: (config.MAX_FREQUENCY)]
-        #         i = 0
-        #
+        if i == 1:
+            for k in range(0, config.N_ROLLING_FFT_HISTORY - 1):
+                y_roll_fft[k] = y[0]
+                i = 0
+
         # # Rolling FFT window
-        # y_roll_fft[:-1] = y_roll_fft[1:]
-        # y_roll_fft[-1, :] = np.copy(YS[config.MIN_FREQUENCY: (config.MAX_FREQUENCY)])
-        #
-        # YS_data = np.concatenate(y_roll_fft, axis=0).astype(np.float32)
-        #
-        # LowHZ = FFT_LowHZ.update(YS_data)
-        # clipped_data = LowHZ[(LowHZ > 0.08)]
-        # print(np.size(clipped_data))
-        #
-        # print("Max of LowHZ is ", np.amax(LowHZ))
-        # print("Max of YS is ", np.amax(YS[config.MIN_FREQUENCY: (config.MAX_FREQUENCY)]))
-        #
-        # if np.size(clipped_data) != 0:
-        #     k = find_peaks(clipped_data)
-        #     Position = k[0]
-        #     print(Position)
-        #
-        #     # Sum = 0
-        #     # for j in Position:
-        #     #     Sum += clipped_data[j]
-        #     # ThresholdTest = Sum/np.size(Position)
-        #     # print("ThresholdTest is ", ThresholdTest)
-        #     #
-        #     # for g in Position:
-        #     #     clipped_data[g] *= 100
-        #     #
-        #     # Threshold = np.sum(clipped_data, axis=1)/(np.size(clipped_data))
-        #
-        #     # for h in Position:
-        #     #     clipped_data[h] = 0
-        #
-        #     Threshold = np.sum(clipped_data)/(np.size(clipped_data))
-        #
-        #     if np.amax(YS[config.MIN_FREQUENCY: (config.MAX_FREQUENCY)]) > Threshold:
-        #         if count > 31:
-        #             count = 0
-        #         count += 1
-        #         print("Threshold is ", Threshold)
-        #         # print("count is ", count)
-        #         print("Beat")
-        #         print("\n")
-        #         print("\n")
-        #         conn.write(Message(NoteOn(count, 69), 1))
-        #
-        #     else:
-        #         print("Threshold is ", Threshold)
-        #         print("\n")
-        #         print("\n")
-        #         pass
+        y_roll_fft[:-1] = y_roll_fft[1:]
+        y_roll_fft[-1] = y[0]
 
-        # print("y = ", y)
-        # print("\n")
-        common_mode.update(y)
-        _prev_spectrum = np.copy(y)
+        Threshold = np.sum(y_roll_fft, axis=0)/np.size(y_roll_fft)
 
-        # if YS[0] > 1:
-        #     if count > 31:
-        #         count = 0
-        #     count += 1
-        #     print("count is ", count)
-        #     print("\n")
-        #     conn.write(Message(NoteOn(count, 69), 1))
+        print("y = ", y[0])
+        print("\n")
+
+        if y[0] > Threshold:
+            if count > 31:
+                count = 0
+            count += 1
+            print("count is ", count)
+            print("\n")
+            conn.write(Message(NoteOn(count, 69), 1))
 
 
 # Number of audio samples to read every time frame
@@ -166,7 +121,7 @@ samples_per_frame = int(config.MIC_RATE / config.FPS)
 y_roll = np.random.rand(config.N_ROLLING_HISTORY, samples_per_frame) / 1e16
 
 # Array containing the rolling fft window
-y_roll_fft = np.random.rand(config.N_ROLLING_FFT_HISTORY, (config.MAX_FREQUENCY-config.MIN_FREQUENCY))
+y_roll_fft = np.random.rand(config.N_ROLLING_FFT_HISTORY)
 
 
 if __name__ == '__main__':
