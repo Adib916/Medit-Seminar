@@ -1,7 +1,7 @@
 '''Documentation found in Documentation/config.txt '''
 MIC_RATE = 48000
 
-FPS = 10
+FPS = 5
 
 MIN_FREQUENCY = 50
 
