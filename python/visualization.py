@@ -78,6 +78,17 @@ def microphone_update(audio_samples):
         with open('logFFT.txt', 'a+') as file:
             file.write("%s\n" % (YS))
 
+        # Construct a Mel filterbank from the FFT data
+        mel = np.atleast_2d(YS).T * dsp.mel_y.T
+        # Scale data to values more suitable for visualization
+        # mel = np.sum(mel, axis=0)
+        mel = np.sum(mel, axis=0)
+        mel = mel**2.0
+        # Gain normalization
+        mel_gain.update(np.max(gaussian_filter1d(mel, sigma=1.0)))
+        mel /= mel_gain.value
+        mel = mel_smoothing.update(mel)
+
         # print("y = ", y)
         # print("\n")
         common_mode.update(y)
