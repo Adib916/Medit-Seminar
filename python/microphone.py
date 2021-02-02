@@ -5,7 +5,6 @@ import config
 
 
 def start_stream(callback):
-    global signal_time
     p = pyaudio.PyAudio()
     frames_per_buffer = int(config.MIC_RATE / config.FPS)
     stream = p.open(format=pyaudio.paInt16,
@@ -16,7 +15,6 @@ def start_stream(callback):
     overflows = 0
     prev_ovf_time = time.time()
     while True:
-        signal_time = time.time()
         try:
             y = np.fromstring(stream.read(frames_per_buffer, exception_on_overflow=False), dtype=np.int16)
             y = y.astype(np.float32)
