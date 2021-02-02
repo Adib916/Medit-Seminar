@@ -132,9 +132,12 @@ def thresholding_algo(CurrentValue):
             print("\n")
             print("\n")
 
-            signal_time = time.time()
+            try:
+                print("--- %s seconds ---" % (time.time() - signal_time))
+            except NameError:
+                pass
             conn.write(Message(NoteOn(count, 69), 1))
-            print("--- %s seconds ---" % (time.time() - signal_time))
+            signal_time = time.time()
 
         filteredTmp = config.INFLUENCE * CurrentValue + (1 - config.INFLUENCE) * filteredY[-1]
 
