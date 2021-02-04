@@ -5,6 +5,8 @@ import config
 
 
 def start_stream(callback):
+    """Called by main in lightcontrol.py with callback as microphone_update inlightcontrol.py.
+        Listens to input and creates stream which is then passed on to microphone_update while True."""
     p = pyaudio.PyAudio()
     frames_per_buffer = int(config.MIC_RATE / config.FPS)
     stream = p.open(format=pyaudio.paInt16,

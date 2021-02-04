@@ -11,23 +11,24 @@ from midi import MidiConnector
 from midi import NoteOn
 from midi import Message
 
+"""Needed variables for calculations"""
 count = 0
 i = 1
 iteration = 0
 used = 0
 
+"""Connect port and set baudrate of Pi to send MIDI signals """
 conn = MidiConnector('/dev/serial0', 38400)
 
-_time_prev = time.time() * 1000.0
 """The previous time that the frames_per_second() function was called"""
+_time_prev = time.time() * 1000.0
 
-_fps = dsp.ExpFilter(val=config.FPS, alpha_decay=0.2, alpha_rise=0.2)
 """The low-pass filter used to estimate frames-per-second"""
+_fps = dsp.ExpFilter(val=config.FPS, alpha_decay=0.2, alpha_rise=0.2)
 
 
 def frames_per_second():
     """Return the estimated frames per second"""
-
     global _time_prev, _fps
     time_now = time.time() * 1000.0
     dt = time_now - _time_prev
@@ -37,6 +38,7 @@ def frames_per_second():
     return _fps.update(1000.0 / dt)
 
 
+""" needed for scaling mel data after transforming fft into mel spectrum"""
 gain = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS),
                      alpha_decay=0.001, alpha_rise=0.99)
 mel_gain = dsp.ExpFilter(np.tile(1e-1, config.N_FFT_BINS),
@@ -49,6 +51,25 @@ fft_window = np.hamming(int(config.MIC_RATE / config.FPS) * config.N_ROLLING_HIS
 
 
 def microphone_update(audio_samples):
+    """Called by microphone.py in while loop.
+    Takes audio inpurt and:
+    1. Calculates FFT
+    2. transforms FFT into mel spectrum via scalar multiplying the mel filter bank with the FFT
+    3. Creates rolling array y_roll_fft to capture the last config.N_ROLLING_FFT_HISTORY number of y[0], which is
+    the 1st value of the scalar multiplication in step 2. This 1st value corresponds to the
+    lowest band of the mel filter bank (lowest bandpass filter) multiplied with the fft, i.e. it
+    captures the lowest frequency band as configured in config.py. This is useful for beat detection,
+    as beats usually are in the lower frequency ranges.
+    4. Calculates the mean and standard deviation of y_roll_fft and uses them for the first adaptive threshold
+    calculation. Delayed threshold_calc by 2 * config.N_ROLLING_FFT_HISTORY iterations, because until then
+     y_roll_fft consists only of 0s. After this it saves y_roll_fft in the new rolling array filteredY
+    5. Uses exponential smoothing and saves the smoothed values into filteredY
+    6. From now on mean and standard deviation will be calculated from filteredY.
+    7. Use these values for adaptive threshold calculation in threshold_calc
+
+    User has to tune config.THRESHOLD and config.INFLUENCE in order to get good results. Could be focus
+    of future work."""
+
     global y_roll, prev_rms, prev_exp, count, i, threshold, influence, iteration
     global filteredY, avgFilter, stdFilter, signal_time
     iteration += 1
@@ -97,11 +118,13 @@ def microphone_update(audio_samples):
         y_roll_fft[:-1] = y_roll_fft[1:]
         y_roll_fft[-1] = y[0]
 
-        if iteration == config.N_ROLLING_FFT_HISTORY:
+        """Delayed threshold_calc by 2 * config.N_ROLLING_FFT_HISTORY iterations, because until then
+         y_roll_fft consists only of 0s"""
+        if iteration == 2 * config.N_ROLLING_FFT_HISTORY:
             filteredY = np.array(y_roll_fft)
             avgFilter = np.mean(y_roll_fft[0:config.N_ROLLING_FFT_HISTORY])
             stdFilter = np.std(y_roll_fft[0:config.N_ROLLING_FFT_HISTORY])
-        elif iteration > config.N_ROLLING_FFT_HISTORY:
+        elif iteration > 2 * config.N_ROLLING_FFT_HISTORY:
             threshold_calc(y[0])
         else:
             pass

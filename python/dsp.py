@@ -5,7 +5,7 @@ import melbank
 
 
 class ExpFilter:
-    """Simple exponential smoothing filter"""
+    """Simple exponential smoothing filter. Wikipedia it..."""
 
     def __init__(self, val=0.0, alpha_decay=0.5, alpha_rise=0.5):
         """Small rise / decay factors = more smoothing"""
@@ -27,6 +27,7 @@ class ExpFilter:
 
 
 def rfft(data, window=None):
+    """real fft"""
     window = 1.0 if window is None else window(len(data))
     ys = np.abs(np.fft.rfft(data * window))
     xs = np.fft.rfftfreq(len(data), 1.0 / config.MIC_RATE)
@@ -34,6 +35,7 @@ def rfft(data, window=None):
 
 
 def fft(data, window=None):
+    """normal fft"""
     window = 1.0 if window is None else window(len(data))
     ys = np.fft.fft(data * window)
     xs = np.fft.fftfreq(len(data), 1.0 / config.MIC_RATE)
@@ -41,6 +43,7 @@ def fft(data, window=None):
 
 
 def create_mel_bank():
+    """needed to create mel filter bank: http://siggigue.github.io/pyfilterbank/melbank.html"""
     global samples, mel_y, mel_x
     samples = int(config.MIC_RATE * config.N_ROLLING_HISTORY / (2.0 * config.FPS))
     mel_y, (_, mel_x) = melbank.compute_melmat(num_mel_bands=config.N_FFT_BINS,
