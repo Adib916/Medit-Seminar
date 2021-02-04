@@ -131,6 +131,7 @@ def microphone_update(audio_samples):
 
 
 def threshold_calc(CurrentValue):
+    """Adaptive threshold calculation to adapt to different mel values or environments"""
     global filteredY, avgFilter, stdFilter, count, signal_time, used
 
     if abs(CurrentValue - avgFilter) > config.THRESHOLD * stdFilter:
