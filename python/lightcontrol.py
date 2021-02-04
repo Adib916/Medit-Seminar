@@ -54,12 +54,9 @@ def microphone_update(audio_samples):
     global filteredY, avgFilter, stdFilter, signal_time
     iteration += 1
 
-    # time.sleep(0.1)
-
     # Normalize samples between 0 and 1
     y = audio_samples / 2.0**15
-    # with open('logAudio.txt', 'a+') as file:
-    #     file.write("%s\n" % (y))
+
     # Construct a rolling window of audio samples
     y_roll[:-1] = y_roll[1:]
     y_roll[-1, :] = np.copy(y)
@@ -113,15 +110,13 @@ def microphone_update(audio_samples):
 
 def threshold_calc(CurrentValue):
     global filteredY, avgFilter, stdFilter, count, signal_time, used
-    # print("Y0 is ", CurrentValue)
-    # print("Y0 - - avgFilter ", CurrentValue-avgFilter)
-    # print("config.THRESHOLD * stdFilter is ", config.THRESHOLD * stdFilter)
+
     if abs(CurrentValue - avgFilter) > config.THRESHOLD * stdFilter:
         if CurrentValue > avgFilter:
             if count > 31:
                 count = 0
             count += 1
-            print("count: ", count)
+            print("MIDI")
             print("\n")
             print("\n")
             print("\n")
