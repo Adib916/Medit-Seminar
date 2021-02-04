@@ -1,4 +1,6 @@
 ## Medit-Seminar
+This repository contains the code for our seminar: "Light Control with Real-time Music Detection".
+
 Inspiration for beat detection: https://github.com/naztronaut/dancyPi-audio-reactive-led
 
 Inspiration for adaptive threshold: https://stackoverflow.com/questions/22583391/peak-signal-detection-in-realtime-timeseries-data
